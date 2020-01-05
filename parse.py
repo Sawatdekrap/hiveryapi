@@ -12,7 +12,7 @@ def parse_people(filename):
     count_dict = {k: {} for k in count_keys}
     list_keys = ['balance', 'email', 'phone', 'address', 'registered']
     list_dict = {k: [] for k in list_keys}
-    nested_keys = ['tags']
+    nested_keys = ['tags', 'favouriteFood']
     nested_dict = {k: [] for k in nested_keys}
     for person in data:
         for k in count_keys:
@@ -27,7 +27,8 @@ def parse_people(filename):
         
         for k in nested_keys:
             for v in person[k]:
-                nested_dict[k].append("{}: {}".format(person['index'], v))
+                # nested_dict[k].append("{}: {}".format(person['index'], v))
+                nested_dict[k].append(v)
     
     if not os.path.exists(OUTDIR):
         os.mkdir(OUTDIR)

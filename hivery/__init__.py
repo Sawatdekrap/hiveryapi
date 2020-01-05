@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, url_for
 from hivery.models import db, init_db
+from hivery.api import api
 
 
 def create_app():
@@ -9,6 +10,8 @@ def create_app():
 
     db.init_app(app)
     app.cli.add_command(init_db)
+
+    api.init_app(app)
 
     @app.route("/")
     @app.route("/status")

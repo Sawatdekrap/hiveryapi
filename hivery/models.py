@@ -14,6 +14,8 @@ class Company(db.Model):
     index = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False)
 
+    employees = db.relationship('Person', back_populates='company')
+
 
 class Person(db.Model):
     index = db.Column(db.Integer, primary_key=True)
@@ -33,6 +35,12 @@ class Person(db.Model):
     registered = db.Column(db.DateTime, nullable=False)
     about = db.Column(db.String)
     greeting = db.Column(db.String)
+
+    company = db.relationship('Company', back_populates='employees')
+    tags = db.relationship('Tag')
+    friends = db.relationship('Person', secondary='friend', primaryjoin='Person.index==friend.c.person_id', secondaryjoin='Person.index==friend.c.friend_id')
+    fruits = db.relationship('Food', primaryjoin='and_(Person.index==food.c.person_id, food.c.type=="fruit")')
+    vegetables = db.relationship('Food', primaryjoin='and_(Person.index==food.c.person_id, food.c.type=="vegetable")')
 
 
 class Tag(db.Model):
@@ -70,6 +78,17 @@ def init_db():
     friends = []
     food = []
     person_keys = [c.name for c in Person.__table__.columns]
+    # TODO move elsewhere
+    food_type_mapping = {
+        'apple': 'fruit',
+        'banana': 'fruit',
+        'beetroot': 'vegetable',
+        'carrot': 'vegetable',
+        'celery': 'vegetable',
+        'cucumber': 'vegetable',
+        'orange': 'fruit',
+        'strawberry': 'fruit',
+    }
     for person in data:
         # Clean person dict by stripping unused keys and formatting values
         person_dict = {k: person[k] for k in person_keys}
@@ -85,7 +104,7 @@ def init_db():
             friends.append(Friend(person_id=person['index'], friend_id=friend['index']))
         for item in set(person['favouriteFood']):
             # TODO correctly parse type
-            food.append(Food(person_id=person['index'], type='fruit', name=item))
+            food.append(Food(person_id=person['index'], type=food_type_mapping[item], name=item))
     
     db.session.add_all(companies)
     db.session.add_all(people)
