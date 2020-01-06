@@ -5,6 +5,7 @@ import click
 import json
 import os
 import datetime
+import decimal
 
 
 db = SQLAlchemy()
@@ -22,7 +23,7 @@ class Person(db.Model):
     _id = db.Column(db.String(24), unique=True, nullable=False)
     guid = db.Column(db.String(16), unique=True, nullable=False)
     has_died = db.Column(db.Boolean, nullable=False)
-    balance = db.Column(db.Numeric(10, 2), nullable=False)
+    balance = db.Column(db.Integer, nullable=False)  # Note this is cents and not dollars - see conversion in init_db
     picture = db.Column(db.String(80))
     name = db.Column(db.String(64), nullable=False)
     gender = db.Column(db.String(1), nullable=False)
@@ -92,7 +93,9 @@ def init_db():
     for person in data:
         # Clean person dict by stripping unused keys and formatting values
         person_dict = {k: person[k] for k in person_keys}
-        person_dict['balance'] = person_dict['balance'].replace('$', '').replace(',', '')
+        balance_str = person_dict['balance'].replace('$', '').replace(',', '')
+        balance_dec = decimal.Decimal(balance_str) * 100  # Converting to cents
+        person_dict['balance'] = int(balance_dec)
         registered = person_dict['registered']
         registered_utc_alter = registered[:-3] + registered[-2:]
         person_dict['registered'] = datetime.datetime.strptime(registered_utc_alter, '%Y-%m-%dT%H:%M:%S %z') # 2016-07-13T12:29:07 -10:00

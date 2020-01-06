@@ -1,6 +1,3 @@
-* Correct API output
-    * (See below for assumptions>fields to display)
-    * q2 add query parameters to allow for common friend filtering
 * Testing scripts
     * API endpoint checks
     * Checks that data has been tansferred correctly
