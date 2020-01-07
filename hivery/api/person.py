@@ -12,7 +12,7 @@ person_simple_schema = api.model('Simple Person', {
     'name': fields.String(required=True, description='person name'),
     'guid': fields.String(required=True, description='person guid'),
 })
-person_schema = person_simple_schema.clone('Person', {
+person_schema = api.clone('Person', person_simple_schema, {
     'has_died': fields.Boolean(required=True, description='whether person has died'),
     'balance': fields.String(description='person balance'),
     'picture': fields.String(description='person profile picture url'),
@@ -27,19 +27,12 @@ person_schema = person_simple_schema.clone('Person', {
     'about': fields.String(description='person about text'),
     'greeting': fields.String(description='person greeting text'),
 })
-
 @api.route('/<int:person_id>')
 class PersonBase(Resource):
     @api.marshal_with(person_schema)
     def get(self, person_id):
         return get_person(person_id)
 
-
-common_friends_schema = api.model('common_friends', {
-    'person_a': fields.Nested(person_simple_schema, required=True),
-    'person_b': fields.Nested(person_simple_schema, required=True),
-    'friends': fields.List(fields.Nested(person_schema), required=True),
-})
 
 # Instantiate a parser to grab query filters from request args
 friends_parser = reqparse.RequestParser()
@@ -48,6 +41,11 @@ friends_parser.add_argument('gender', choices=('male', 'female'), location='args
 friends_parser.add_argument('age', type=int, location='args')
 friends_parser.add_argument('eye_color', type=str, location='args')
 
+common_friends_schema = api.model('common_friends', {
+    'person_a': fields.Nested(person_simple_schema, required=True),
+    'person_b': fields.Nested(person_simple_schema, required=True),
+    'friends': fields.List(fields.Nested(person_schema), required=True),
+})
 @api.route('/<int:person_id>/common_friends/<int:friend_id>')
 class CommonFriends(Resource):
     @api.expect(friends_parser)

@@ -25,3 +25,6 @@ up-dev:
 test:
 	FLASK_ENV=testing
 	python -m pytest
+
+api_features:
+	python scripts/api_features.py

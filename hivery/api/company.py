@@ -9,7 +9,6 @@ company_schema = api.model('company', {
     'index': fields.Integer(required=True, description='company index'),
     'name': fields.String(required=True, description='company name'),
 })
-
 @api.route('/')
 class CompanyRoot(Resource):
     @api.marshal_list_with(company_schema)
@@ -23,8 +22,6 @@ employee_schema = api.model('employee', {
     'guid': fields.String(required=True, description='employee guid'),
     'email': fields.String(required=True, description='employee email'),
 })
-
-
 @api.route('/<int:company_id>/employees')
 class CompanyEmployees(Resource):
     @api.marshal_list_with(employee_schema)

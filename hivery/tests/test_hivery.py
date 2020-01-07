@@ -1,20 +1,24 @@
 import pytest
 import os
 from hivery import create_app
-from hivery.models import db, load_db_from_resources
+from hivery.models import db, create_db_from_resources
 
 
 @pytest.fixture(scope='session')
 def app():
+    """Flask app fixture for tests
+    
+    Called once (scope='session') so that database can be constructed for tests
+    """
     app = create_app()
     with app.app_context():
-        db.create_all()
-        load_db_from_resources(os.path.join('hivery', 'tests', 'data'))
+        create_db_from_resources()
     return app
 
 
 @pytest.fixture()
 def client(app):
+    """Flask test client fixture"""
     client = app.test_client()
 
     return client

@@ -15,6 +15,7 @@ def create_app():
 
     app.register_blueprint(api_bp)
 
+    # Route root calls to status page to show that it's live
     @app.route("/")
     @app.route("/status")
     def _status():
