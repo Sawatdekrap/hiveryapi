@@ -1,11 +1,18 @@
+"""
+Parse the contents of the people.json file to output each field
+in different files. Used to run things like sort, uniq, grep, etc
+to examine data.
+"""
 import json
 import os
+import sys
 
 
 OUTDIR = 'out'
 
 
-def parse_people(filename):
+def parse_resources(resources_dir):
+    filename = os.path.join(resources_dir, 'people.json')
     with open(filename, 'r') as f:
         data = json.load(f)
     count_keys = ['has_died', 'gender', 'company_id']
@@ -56,5 +63,7 @@ def parse_people(filename):
 
 
 if __name__ == '__main__':
-    people_filename = os.path.join('resources', 'people.json')
-    parse_people(people_filename)
+    if len(sys.argv) != 2:
+        print('Usage: python parse.py <resources_dir>')
+        exit(1)
+    parse_resources(sys.argv[1])

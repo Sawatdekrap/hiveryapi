@@ -15,6 +15,10 @@ def get_companies():
     return companies
 
 
+def get_person(person_id):
+    return check_existance(Person, person_id)
+
+
 def get_company_employees(company_id):
     check_existance(Company, company_id)
     employees = (

@@ -23,16 +23,16 @@ class Person(db.Model):
     _id = db.Column(db.String(24), unique=True, nullable=False)
     guid = db.Column(db.String(16), unique=True, nullable=False)
     has_died = db.Column(db.Boolean, nullable=False)
-    balance = db.Column(db.Integer, nullable=False)  # Note this is cents and not dollars - see conversion in init_db
+    balance = db.Column(db.Integer)  # Note this is cents and not dollars - see conversion in init_db
     picture = db.Column(db.String(80))
     name = db.Column(db.String(64), nullable=False)
     gender = db.Column(db.String(1), nullable=False)
     age = db.Column(db.Integer)
     eyeColor = db.Column(db.String(20))
-    company_id = db.Column(db.Integer, ForeignKey("company.index"), nullable=False)
-    email = db.Column(db.String(80), nullable=False)
-    phone = db.Column(db.String(12), nullable=False)
-    address = db.Column(db.String(80), nullable=False)
+    company_id = db.Column(db.Integer, ForeignKey("company.index"))
+    email = db.Column(db.String(80))
+    phone = db.Column(db.String(12))
+    address = db.Column(db.String(80))
     registered = db.Column(db.DateTime, nullable=False)
     about = db.Column(db.String)
     greeting = db.Column(db.String)
@@ -60,18 +60,13 @@ class Food(db.Model):
     name = db.Column(db.String(32), primary_key=True)
 
 
-@click.command('init-db')
-@with_appcontext
-def init_db():
-    db.create_all()
-
-    resource_dir = 'resources'
-    company_file = os.path.join(resource_dir, 'companies.json')
+def load_db_from_resources(resources_dir):
+    company_file = os.path.join(resources_dir, 'companies.json')
     with open(company_file, 'r') as f:
         data = json.load(f)
     companies = [Company(index=company['index'], name=company['company']) for company in data]
 
-    people_file = os.path.join(resource_dir, 'people.json')
+    people_file = os.path.join(resources_dir, 'people.json')
     with open(people_file, 'r') as f:
         data = json.load(f)
     people = []
@@ -79,17 +74,11 @@ def init_db():
     friends = []
     food = []
     person_keys = [c.name for c in Person.__table__.columns]
-    # TODO move elsewhere
-    food_type_mapping = {
-        'apple': 'fruit',
-        'banana': 'fruit',
-        'beetroot': 'vegetable',
-        'carrot': 'vegetable',
-        'celery': 'vegetable',
-        'cucumber': 'vegetable',
-        'orange': 'fruit',
-        'strawberry': 'fruit',
-    }
+    
+    food_file = os.path.join(resources_dir, 'food.json')
+    with open(food_file, 'r') as f:
+        food_type_mapping = json.load(f)
+
     for person in data:
         # Clean person dict by stripping unused keys and formatting values
         person_dict = {k: person[k] for k in person_keys}
@@ -120,3 +109,10 @@ def init_db():
     except:
         db.session.rollback()
         raise
+
+
+@click.command('db-init')
+@with_appcontext
+def db_init():
+    db.create_all()
+    load_db_from_resources(resources_dir='resources')

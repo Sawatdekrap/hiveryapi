@@ -1,23 +1,23 @@
 from flask import Flask, url_for
-from hivery.models import db, init_db
-from hivery.api import api
+from hivery.config import config_by_name
+from hivery.models import db, db_init
+from hivery.api import blueprint as api_bp
+import os
 
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['RESTPLUS_MASK_SWAGGER'] = False
-    app.config['ERROR_404_HELP'] = False
+    flask_env = os.environ.get('FLASK_ENV', 'production')
+    app.config.from_object(config_by_name[flask_env])
 
     db.init_app(app)
-    app.cli.add_command(init_db)
+    app.cli.add_command(db_init)
 
-    api.init_app(app)
+    app.register_blueprint(api_bp)
 
     @app.route("/")
     @app.route("/status")
     def _status():
-        return "Yes, it's working"
+        return "Hivery api is running"
 
     return app
