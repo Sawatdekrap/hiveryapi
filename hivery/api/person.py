@@ -27,11 +27,11 @@ person_schema = api.clone('Person', person_simple_schema, {
     'about': fields.String(description='person about text'),
     'greeting': fields.String(description='person greeting text'),
 })
-@api.route('/<int:person_id>')
+@api.route('/<int:person_index>')
 class PersonBase(Resource):
     @api.marshal_with(person_schema)
-    def get(self, person_id):
-        return get_person(person_id)
+    def get(self, person_index):
+        return get_person(person_index)
 
 
 # Instantiate a parser to grab query filters from request args
@@ -46,15 +46,15 @@ common_friends_schema = api.model('common_friends', {
     'person_b': fields.Nested(person_simple_schema, required=True),
     'friends': fields.List(fields.Nested(person_schema), required=True),
 })
-@api.route('/<int:person_id>/common_friends/<int:friend_id>')
+@api.route('/<int:person_index>/common_friends/<int:friend_index>')
 class CommonFriends(Resource):
     @api.expect(friends_parser)
     @api.marshal_with(common_friends_schema)
-    def get(self, person_id, friend_id):
+    def get(self, person_index, friend_index):
         # Get query filters from request args as specified by friends_parser
         filter_args = friends_parser.parse_args()
         
-        data = get_common_friends(person_id, friend_id, **filter_args)
+        data = get_common_friends(person_index, friend_index, **filter_args)
         return data
 
 
@@ -65,8 +65,8 @@ foods_schema = api.model('foods', {
     'vegetables': fields.List(fields.String(attribute='name'), required=True, description='person favourite vegetables'),
 })
 
-@api.route('/<int:person_id>/favourite_foods')
+@api.route('/<int:person_index>/favourite_foods')
 class FavouriteFoods(Resource):
     @api.marshal_with(foods_schema)
-    def get(self, person_id):
-        return get_favourite_foods(person_id)
+    def get(self, person_index):
+        return get_favourite_foods(person_index)

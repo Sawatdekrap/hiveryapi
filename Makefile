@@ -1,8 +1,12 @@
 .EXPORT_ALL_VARIABLES:
-.PHONY: parse db-clean db-init up up-dev test
+.PHONY: requirements parse db-clean db-init up up-dev test
 
 FLASK_APP=hivery
 FLASK_ENV=production
+
+requirements:
+	pip install wheel
+	pip install -r requirements.txt
 
 parse:
 	python scripts/parse.py resources
@@ -19,11 +23,11 @@ up:
 	flask run
 
 up-dev:
-	FLASK_ENV=development
+	$(eval FLASK_ENV=development)
 	flask run
 
 test:
-	FLASK_ENV=testing
+	$(eval FLASK_ENV=testing)
 	python -m pytest
 
 api_features:

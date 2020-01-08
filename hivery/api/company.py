@@ -22,8 +22,8 @@ employee_schema = api.model('employee', {
     'guid': fields.String(required=True, description='employee guid'),
     'email': fields.String(required=True, description='employee email'),
 })
-@api.route('/<int:company_id>/employees')
+@api.route('/<int:company_index>/employees')
 class CompanyEmployees(Resource):
     @api.marshal_list_with(employee_schema)
-    def get(self, company_id):
-        return get_company_employees(company_id)
+    def get(self, company_index):
+        return get_company_employees(company_index)

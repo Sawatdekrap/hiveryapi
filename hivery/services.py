@@ -1,4 +1,4 @@
-from sqlalchemy.orm import joinedload, aliased
+from sqlalchemy.orm import subqueryload, aliased
 from flask_restplus import abort
 from hivery.models import db, Company, Person, Friend, Food
 
@@ -75,8 +75,8 @@ def get_favourite_foods(person_id, **kwargs):
 
     data = (
         db.session.query(Person)
-        .options(joinedload(Person.fruits))
-        .options(joinedload(Person.vegetables))
+        .options(subqueryload(Person.fruits))
+        .options(subqueryload(Person.vegetables))
         .filter(Person.index==person_id)
         .one_or_none()
     )
